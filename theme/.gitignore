@@ -1,0 +1,7 @@
+# Build output
+dist/
+*.log
+
+# WordPress
+.DS_Store
+Thumbs.db

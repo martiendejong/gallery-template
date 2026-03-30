@@ -1,0 +1,61 @@
+# WordPress Core Files
+wp-admin/
+wp-includes/
+wp-content/index.php
+wp-content/plugins/index.php
+wp-content/themes/index.php
+
+# WordPress Core (keep only our theme)
+wp-content/plugins/*
+!wp-content/plugins/.gitkeep
+wp-content/themes/*
+!wp-content/themes/opus-gallery/
+
+# WordPress Uploads & Cache
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/backups/
+
+# WordPress Config (contains database credentials)
+wp-config.php
+wp-config-sample.php
+
+# Database
+*.sql
+*.sql.gz
+
+# Logs
+*.log
+error_log
+debug.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if any WordPress plugins use npm)
+node_modules/
+package-lock.json
+
+# Environment files
+.env
+.env.*
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.cache
+
+# Theme build artifacts (we want to keep dist/ for production)
+# theme/node_modules/ (if you add npm to theme)
