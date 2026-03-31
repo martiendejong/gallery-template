@@ -20,6 +20,7 @@
 <script>
 window.wpData = {
     apiUrl: '<?php echo esc_url(rest_url('opus/v1')); ?>',
+    wpApiUrl: '<?php echo esc_url(rest_url('wp/v2')); ?>',
     siteUrl: '<?php echo esc_url(home_url()); ?>',
     nonce: '<?php echo wp_create_nonce('wp_rest'); ?>',
     siteName: '<?php bloginfo('name'); ?>',
