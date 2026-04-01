@@ -440,6 +440,26 @@ function opus_add_cors_headers() {
 add_action('rest_api_init', 'opus_add_cors_headers');
 
 /**
+ * Expose page custom fields in REST API
+ */
+function opus_register_page_meta() {
+    register_rest_field('page', 'meta_fields', [
+        'get_callback' => function($post) {
+            return [
+                'hero_location' => get_post_meta($post['id'], 'hero_location', true),
+                'hero_subtitle' => get_post_meta($post['id'], 'hero_subtitle', true),
+                'hero_button_text' => get_post_meta($post['id'], 'hero_button_text', true),
+            ];
+        },
+        'schema' => [
+            'description' => 'Custom meta fields for the page',
+            'type' => 'object',
+        ],
+    ]);
+}
+add_action('rest_api_init', 'opus_register_page_meta');
+
+/**
  * Disable WordPress theme file editor for security
  */
 define('DISALLOW_FILE_EDIT', true);
