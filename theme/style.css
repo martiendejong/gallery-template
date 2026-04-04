@@ -1,25 +1,6 @@
 /*
-Theme Name: OPUS Gallery
-Theme URI: https://opusgallery.art
-Author: Martien de Jong
-Author URI: https://martiendejong.nl
-Description: Modern art gallery theme built with React. Features cinematic animations, parallax effects, and headless WordPress architecture. Content managed through WordPress admin, displayed with beautiful React UI.
+Theme Name: Opus Gallery
+Description: Luxury art gallery — React/Vite SPA wrapped in a WordPress theme.
 Version: 1.0.0
-Requires at least: 6.0
-Tested up to: 6.7
-Requires PHP: 8.0
-License: GPL v2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: opus-gallery
-Tags: art-gallery, react, headless, modern, animations, portfolio
 */
-
-/**
- * OPUS Gallery Theme
- *
- * This theme is a React Single Page Application (SPA) that fetches
- * content from WordPress REST API. All styling is handled by the
- * React app (Tailwind CSS).
- *
- * This file exists only for WordPress theme metadata.
- */
