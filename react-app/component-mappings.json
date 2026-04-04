@@ -1,0 +1,52 @@
+{
+  "mappings": {
+    "HeroSlideshow": {
+      "blockType": "hero",
+      "propMapping": {
+        "title": "title",
+        "subtitle": "subtitle",
+        "location": "location",
+        "buttonText": "buttonText",
+        "images": "backgroundImage"
+      },
+      "transformation": "first-image-only"
+    },
+    "CinematicHero": {
+      "blockType": "hero",
+      "propMapping": {
+        "title": "title",
+        "subtitle": "subtitle"
+      }
+    },
+    "Galleries": {
+      "blockType": "gallery_grid",
+      "dataSource": "wordpress-galleries",
+      "propMapping": {
+        "galleries": "items"
+      }
+    },
+    "ArtistCard": {
+      "blockType": "artist_card",
+      "propMapping": {
+        "name": "name",
+        "image": "image",
+        "bio": "bio"
+      }
+    }
+  },
+  "pageLayouts": {
+    "Index": [
+      { "component": "HeroSlideshow", "order": 1 },
+      { "component": "FeaturedArtworks", "order": 2 },
+      { "component": "CallToAction", "order": 3 }
+    ],
+    "Galleries": [
+      { "component": "PageHeader", "order": 1 },
+      { "component": "GalleryGrid", "order": 2 }
+    ],
+    "Artists": [
+      { "component": "PageHeader", "order": 1 },
+      { "component": "ArtistGrid", "order": 2 }
+    ]
+  }
+}

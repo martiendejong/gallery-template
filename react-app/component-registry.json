@@ -1,0 +1,545 @@
+[
+  {
+    "name": "queryClient",
+    "path": "src/App.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "AnimatedCounter",
+    "path": "src/components/AnimatedCounter.tsx",
+    "props": [
+      "end",
+      "suffix",
+      "prefix",
+      "duration",
+      "className"
+    ],
+    "usedIn": []
+  },
+  {
+    "name": "AnimatedText",
+    "path": "src/components/AnimatedText.tsx",
+    "props": [
+      "text",
+      "className",
+      "once"
+    ],
+    "usedIn": []
+  },
+  {
+    "name": "CinematicHero",
+    "path": "src/components/CinematicHero.tsx",
+    "props": [
+      "videoSrc",
+      "imageSrc",
+      "imageAlt",
+      "className"
+    ],
+    "usedIn": []
+  },
+  {
+    "name": "Footer",
+    "path": "src/components/Footer.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "FormField",
+    "path": "src/components/FormField.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "FormField",
+    "path": "src/components/Header.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "slideImages",
+    "path": "src/components/HeroSlideshow.tsx",
+    "props": [
+      "className"
+    ],
+    "usedIn": []
+  },
+  {
+    "name": "ImageLightbox",
+    "path": "src/components/ImageLightbox.tsx",
+    "props": [
+      "images",
+      "initialIndex",
+      "isOpen",
+      "onClose",
+      "silhouetteIndex"
+    ],
+    "usedIn": []
+  },
+  {
+    "name": "LoadingScreen",
+    "path": "src/components/LoadingScreen.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Magnetic",
+    "path": "src/components/Magnetic.tsx",
+    "props": [
+      "children",
+      "className",
+      "strength"
+    ],
+    "usedIn": []
+  },
+  {
+    "name": "NavLink",
+    "path": "src/components/NavLink.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "PageTransition",
+    "path": "src/components/PageTransition.tsx",
+    "props": [
+      "children"
+    ],
+    "usedIn": []
+  },
+  {
+    "name": "Parallax",
+    "path": "src/components/Parallax.tsx",
+    "props": [
+      "children",
+      "speed",
+      "className"
+    ],
+    "usedIn": []
+  },
+  {
+    "name": "RevealImage",
+    "path": "src/components/RevealImage.tsx",
+    "props": [
+      "src",
+      "alt",
+      "className",
+      "aspectRatio",
+      "hoverScale"
+    ],
+    "usedIn": []
+  },
+  {
+    "name": "Accordion",
+    "path": "src/components/ui/accordion.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "AlertDialog",
+    "path": "src/components/ui/alert-dialog.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "alertVariants",
+    "path": "src/components/ui/alert.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "AspectRatio",
+    "path": "src/components/ui/aspect-ratio.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Avatar",
+    "path": "src/components/ui/avatar.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "badgeVariants",
+    "path": "src/components/ui/badge.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Breadcrumb",
+    "path": "src/components/ui/breadcrumb.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "buttonVariants",
+    "path": "src/components/ui/button.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Calendar",
+    "path": "src/components/ui/calendar.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Card",
+    "path": "src/components/ui/card.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "CarouselContext",
+    "path": "src/components/ui/carousel.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "THEMES",
+    "path": "src/components/ui/chart.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Checkbox",
+    "path": "src/components/ui/checkbox.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Collapsible",
+    "path": "src/components/ui/collapsible.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Command",
+    "path": "src/components/ui/command.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "ContextMenu",
+    "path": "src/components/ui/context-menu.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Dialog",
+    "path": "src/components/ui/dialog.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Drawer",
+    "path": "src/components/ui/drawer.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "DropdownMenu",
+    "path": "src/components/ui/dropdown-menu.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Form",
+    "path": "src/components/ui/form.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "HoverCard",
+    "path": "src/components/ui/hover-card.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "InputOTP",
+    "path": "src/components/ui/input-otp.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Input",
+    "path": "src/components/ui/input.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "labelVariants",
+    "path": "src/components/ui/label.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "MenubarMenu",
+    "path": "src/components/ui/menubar.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "NavigationMenu",
+    "path": "src/components/ui/navigation-menu.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Pagination",
+    "path": "src/components/ui/pagination.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Popover",
+    "path": "src/components/ui/popover.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Progress",
+    "path": "src/components/ui/progress.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "RadioGroup",
+    "path": "src/components/ui/radio-group.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "ResizablePanelGroup",
+    "path": "src/components/ui/resizable.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "ScrollArea",
+    "path": "src/components/ui/scroll-area.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Select",
+    "path": "src/components/ui/select.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Separator",
+    "path": "src/components/ui/separator.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Sheet",
+    "path": "src/components/ui/sheet.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "SIDEBAR_COOKIE_NAME",
+    "path": "src/components/ui/sidebar.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Skeleton",
+    "path": "src/components/ui/skeleton.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Slider",
+    "path": "src/components/ui/slider.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Toaster",
+    "path": "src/components/ui/sonner.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Switch",
+    "path": "src/components/ui/switch.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Table",
+    "path": "src/components/ui/table.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Tabs",
+    "path": "src/components/ui/tabs.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Textarea",
+    "path": "src/components/ui/textarea.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "ToastProvider",
+    "path": "src/components/ui/toast.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Toaster",
+    "path": "src/components/ui/toaster.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "ToggleGroupContext",
+    "path": "src/components/ui/toggle-group.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "toggleVariants",
+    "path": "src/components/ui/toggle.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "TooltipProvider",
+    "path": "src/components/ui/tooltip.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "MOBILE_BREAKPOINT",
+    "path": "src/hooks/use-mobile.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "About",
+    "path": "src/pages/About.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Artists",
+    "path": "src/pages/Artists.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "BookViewing",
+    "path": "src/pages/BookViewing.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "milestones",
+    "path": "src/pages/BugattiHeritage.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Certificate",
+    "path": "src/pages/Certificate.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Compare",
+    "path": "src/pages/Compare.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Contact",
+    "path": "src/pages/Contact.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Depot",
+    "path": "src/pages/Depot.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "upcoming",
+    "path": "src/pages/Exhibitions.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "categoryIcons",
+    "path": "src/pages/Galleries.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "GalleryDetail",
+    "path": "src/pages/GalleryDetail.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Index",
+    "path": "src/pages/Index.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "Membership",
+    "path": "src/pages/Membership.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "NotFound",
+    "path": "src/pages/NotFound.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "PieceDetail",
+    "path": "src/pages/PieceDetail.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "articles",
+    "path": "src/pages/Press.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "QRLanding",
+    "path": "src/pages/QRLanding.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "FormField",
+    "path": "src/pages/Register.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "ITEMS_PER_PAGE",
+    "path": "src/pages/Registry.tsx",
+    "props": [],
+    "usedIn": []
+  },
+  {
+    "name": "FormField",
+    "path": "src/pages/SignIn.tsx",
+    "props": [],
+    "usedIn": []
+  }
+]
