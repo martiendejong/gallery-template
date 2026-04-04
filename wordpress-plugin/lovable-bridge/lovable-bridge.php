@@ -23,6 +23,7 @@ class Lovable_Bridge {
     private function __construct() {
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('init', [$this, 'register_block_types']);
+        add_action('save_post', [$this, 'invalidate_cache']);
     }
 
     public function register_rest_routes() {
@@ -70,6 +71,7 @@ class Lovable_Bridge {
             return new WP_Error('page_creation_failed', $page_id->get_error_message());
         }
 
+        // Validate blocks before saving
         if (!empty($params['blocks'])) {
             foreach ($params['blocks'] as $block) {
                 $valid = Lovable_Block_Registry::validate_block($block);
@@ -92,13 +94,67 @@ class Lovable_Bridge {
 
     public function get_page_blocks($request) {
         $page_id = absint($request['id']);
+
+        // Check transient cache first
+        $cache_key = "lovable_blocks_{$page_id}";
+        $cached = get_transient($cache_key);
+
+        if ($cached !== false) {
+            return $cached;
+        }
+
         $blocks = get_post_meta($page_id, 'lovable_blocks', true);
         $layout = get_post_meta($page_id, 'lovable_layout', true);
 
-        return [
+        $result = [
             'blocks' => json_decode($blocks ?: '[]'),
             'layout' => json_decode($layout ?: '[]')
         ];
+
+        // Cache for 1 hour
+        set_transient($cache_key, $result, HOUR_IN_SECONDS);
+
+        return $result;
+    }
+
+    public function invalidate_cache($post_id) {
+        delete_transient("lovable_blocks_{$post_id}");
+    }
+
+    public function render_blocks($page_id) {
+        $blocks = json_decode(get_post_meta($page_id, 'lovable_blocks', true) ?: '[]', true);
+        $layout = json_decode(get_post_meta($page_id, 'lovable_layout', true) ?: '[]', true);
+
+        ob_start();
+
+        foreach ($layout as $layout_item) {
+            $block = $this->find_block_by_id($blocks, $layout_item['id']);
+            if ($block) {
+                $this->render_single_block($block);
+            }
+        }
+
+        return ob_get_clean();
+    }
+
+    private function find_block_by_id($blocks, $id) {
+        foreach ($blocks as $block) {
+            if (isset($block['id']) && $block['id'] === $id) {
+                return $block;
+            }
+        }
+        return null;
+    }
+
+    private function render_single_block($block) {
+        $type = $block['type'];
+        $template_file = plugin_dir_path(__FILE__) . "blocks/{$type}.php";
+
+        if (file_exists($template_file)) {
+            include $template_file;
+        } else {
+            echo "<!-- Block type '{$type}' not found -->";
+        }
     }
 }
 
