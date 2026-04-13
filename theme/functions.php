@@ -53,8 +53,13 @@ function opus_enqueue_react_app() {
     $theme_dir = get_template_directory();
     $theme_uri = get_template_directory_uri();
 
-    // Check for Vite manifest (production build)
-    $manifest_path = $theme_dir . '/assets/.vite/manifest.json';
+    // Use WP_CONTENT_DIR so the path stays within htdocs — XAMPP's PHP process
+    // may not follow the junction back to C:\projects\ when using $theme_dir directly.
+    // Try dist/ (current vite outDir) then assets/ (alternative layout).
+    $manifest_path = WP_CONTENT_DIR . '/themes/' . get_stylesheet() . '/dist/.vite/manifest.json';
+    if (!file_exists($manifest_path)) {
+        $manifest_path = WP_CONTENT_DIR . '/themes/' . get_stylesheet() . '/assets/.vite/manifest.json';
+    }
 
     if (file_exists($manifest_path)) {
         // PRODUCTION: Read hashed filenames from Vite manifest
@@ -362,7 +367,13 @@ function opus_get_exhibitions($request) {
 }
 
 function opus_get_menu($request) {
-    $menu_items = wp_get_nav_menu_items('header-menu');
+    // Resolve the menu assigned to the 'header-menu' location rather than looking
+    // for a menu literally named 'header-menu'.
+    $locations = get_nav_menu_locations();
+    if (empty($locations['header-menu'])) {
+        return rest_ensure_response([]);
+    }
+    $menu_items = wp_get_nav_menu_items($locations['header-menu']);
     if (!$menu_items) {
         return rest_ensure_response([]);
     }
@@ -499,6 +510,21 @@ function opus_register_page_meta() {
     ]);
 }
 add_action('rest_api_init', 'opus_register_page_meta');
+
+/**
+ * Catch all unknown routes for React Router
+ *
+ * WordPress returns 404 for any URL that doesn't match a post/page.
+ * For a React SPA we want WordPress to serve the app shell with 200
+ * for every front-end route so React Router can handle it client-side.
+ */
+add_action('template_redirect', function () {
+    if (is_404() && !is_admin()) {
+        status_header(200);
+        include get_template_directory() . '/index.php';
+        exit;
+    }
+});
 
 // Disable WordPress theme file editor for security
 define('DISALLOW_FILE_EDIT', true);
