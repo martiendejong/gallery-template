@@ -1,34 +1,27 @@
-<!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-<head>
-    <meta charset="<?php bloginfo('charset'); ?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="<?php bloginfo('description'); ?>">
-    <title><?php wp_title('|', true, 'right'); bloginfo('name'); ?></title>
+<?php
+/**
+ * Opus Gallery Theme - Main Template
+ * Hybrid rendering: WordPress HTML + React hydration
+ */
+get_header();
 
-    <!-- Preconnect to WordPress API -->
-    <link rel="preconnect" href="<?php echo esc_url(home_url()); ?>">
+if (have_posts()) :
+    while (have_posts()) : the_post();
+        $page_id = get_the_ID();
+        $blocks = get_post_meta($page_id, 'lovable_blocks', true);
+        $layout = get_post_meta($page_id, 'lovable_layout', true);
 
-    <?php wp_head(); ?>
-</head>
-<body <?php body_class(); ?>>
+        // Render WordPress HTML (SEO layer)
+        if ($blocks && $layout && class_exists('Lovable_Bridge')) {
+            echo Lovable_Bridge::get_instance()->render_blocks($page_id);
+        } else {
+            // Fallback to standard WordPress content
+            the_content();
+        }
+    endwhile;
+endif;
 
-<!-- React App Root -->
+// React mount point for SPA hydration
+?>
 <div id="root"></div>
-
-<!-- WordPress Data for React -->
-<script>
-window.wpData = {
-    apiUrl: '<?php echo esc_url(rest_url('opus/v1')); ?>',
-    wpApiUrl: '<?php echo esc_url(rest_url('wp/v2')); ?>',
-    siteUrl: '<?php echo esc_url(home_url()); ?>',
-    nonce: '<?php echo wp_create_nonce('wp_rest'); ?>',
-    siteName: '<?php bloginfo('name'); ?>',
-    siteDescription: '<?php bloginfo('description'); ?>',
-    language: '<?php echo get_bloginfo('language'); ?>',
-};
-</script>
-
-<?php wp_footer(); ?>
-</body>
-</html>
+<?php get_footer(); ?>
