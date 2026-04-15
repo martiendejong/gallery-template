@@ -128,6 +128,9 @@ function opus_enqueue_react_app() {
     }
 
     // Pass WordPress data to React
+    $site_path = parse_url(home_url(), PHP_URL_PATH);
+    $base_path = $site_path ? rtrim($site_path, '/') : '';
+
     wp_localize_script('opus-gallery-main', 'opusData', [
         'apiUrl'   => rest_url('lovable/v1'),
         'wpApiUrl' => rest_url('opus/v1'),
@@ -136,6 +139,7 @@ function opus_enqueue_react_app() {
         'pageId'   => get_the_ID() ?: 0,
         'locale'   => get_locale(),
         'themeUrl' => $theme_uri,
+        'basePath' => $base_path ?: '/',
     ]);
 }
 add_action('wp_enqueue_scripts', 'opus_enqueue_react_app');
@@ -252,6 +256,12 @@ function opus_register_rest_routes() {
         'permission_callback' => '__return_true',
     ]);
 
+    register_rest_route('opus/v1', '/artists/(?P<id>\d+)', [
+        'methods'             => 'GET',
+        'callback'            => 'opus_get_artist',
+        'permission_callback' => '__return_true',
+    ]);
+
     register_rest_route('opus/v1', '/exhibitions', [
         'methods'             => 'GET',
         'callback'            => 'opus_get_exhibitions',
@@ -302,12 +312,34 @@ function opus_get_artworks($request) {
         'post_status'    => 'publish',
     ];
 
+    $meta_query = [];
+
     if (isset($request['gallery_id'])) {
-        $args['meta_query'] = [[
+        $meta_query[] = [
             'key'     => 'gallery_id',
-            'value'   => $request['gallery_id'],
+            'value'   => absint($request['gallery_id']),
             'compare' => '=',
-        ]];
+        ];
+    }
+
+    if (isset($request['artist_id'])) {
+        $meta_query[] = [
+            'key'     => 'artist_id',
+            'value'   => absint($request['artist_id']),
+            'compare' => '=',
+        ];
+    }
+
+    if (isset($request['location'])) {
+        $meta_query[] = [
+            'key'     => 'location',
+            'value'   => sanitize_text_field($request['location']),
+            'compare' => '=',
+        ];
+    }
+
+    if (!empty($meta_query)) {
+        $args['meta_query'] = $meta_query;
     }
 
     $artworks = [];
@@ -346,6 +378,14 @@ function opus_get_artists($request) {
     }
     wp_reset_postdata();
     return rest_ensure_response($artists);
+}
+
+function opus_get_artist($request) {
+    $post = get_post(absint($request['id']));
+    if (!$post || $post->post_type !== 'opus_artist') {
+        return new WP_Error('not_found', 'Artist not found', ['status' => 404]);
+    }
+    return rest_ensure_response(opus_format_artist_data($post));
 }
 
 function opus_get_exhibitions($request) {
@@ -410,21 +450,67 @@ function opus_format_gallery_data($post) {
 }
 
 function opus_format_artwork_data($post) {
+    // Resolve artist name eagerly to avoid N+1 queries on client
+    $artist_id   = get_post_meta($post->ID, 'artist_id', true);
+    $artist_post = $artist_id ? get_post((int) $artist_id) : null;
+
+    // Gather all images: featured image + additional gallery images
+    $images     = [];
+    $main_image = get_the_post_thumbnail_url($post, 'opus-large');
+    if ($main_image) {
+        $images[] = $main_image;
+    }
+    $additional = get_post_meta($post->ID, 'additional_images', true);
+    if (is_array($additional)) {
+        foreach ($additional as $img_id) {
+            $url = wp_get_attachment_image_url($img_id, 'opus-large');
+            if ($url) {
+                $images[] = $url;
+            }
+        }
+    }
+
+    // Keywords: stored as comma-separated string or serialized array
+    $keywords_raw = get_post_meta($post->ID, 'keywords', true);
+    $keywords     = is_array($keywords_raw)
+        ? $keywords_raw
+        : array_filter(array_map('trim', explode(',', $keywords_raw ?: '')));
+
+    $status   = get_post_meta($post->ID, 'status', true) ?: 'available';
+    $location = get_post_meta($post->ID, 'location', true);
+    if (!$location) {
+        $location = ($status === 'available') ? 'gallery' : 'depot';
+    }
+
     return [
-        'id'          => $post->ID,
-        'title'       => get_the_title($post),
-        'slug'        => $post->post_name,
-        'description' => get_the_content(null, false, $post),
-        'image'       => get_the_post_thumbnail_url($post, 'opus-large'),
-        'thumbnail'   => get_the_post_thumbnail_url($post, 'opus-thumbnail'),
-        'artist_id'   => get_post_meta($post->ID, 'artist_id', true),
-        'gallery_id'  => get_post_meta($post->ID, 'gallery_id', true),
-        'price'       => get_post_meta($post->ID, 'price', true),
-        'year'        => get_post_meta($post->ID, 'year', true),
-        'medium'      => get_post_meta($post->ID, 'medium', true),
-        'dimensions'  => get_post_meta($post->ID, 'dimensions', true),
-        'status'      => get_post_meta($post->ID, 'status', true),
-        'date'        => get_the_date('c', $post),
+        'id'                   => $post->ID,
+        'title'                => get_the_title($post),
+        'slug'                 => $post->post_name,
+        'description'          => get_the_content(null, false, $post),
+        'short_description'    => get_post_meta($post->ID, 'short_description', true) ?: '',
+        'extended_description' => get_post_meta($post->ID, 'extended_description', true) ?: '',
+        'story'                => get_post_meta($post->ID, 'story', true) ?: '',
+        'image'                => $main_image ?: '',
+        'thumbnail'            => get_the_post_thumbnail_url($post, 'opus-thumbnail') ?: '',
+        'images'               => $images,
+        'artist_id'            => (int) $artist_id,
+        'artist_name'          => $artist_post ? get_the_title($artist_post) : '',
+        'gallery_id'           => (int) get_post_meta($post->ID, 'gallery_id', true),
+        'price'                => get_post_meta($post->ID, 'price', true) ?: '',
+        'price_label'          => get_post_meta($post->ID, 'price_label', true) ?: '',
+        'year'                 => get_post_meta($post->ID, 'year', true) ?: '',
+        'medium'               => get_post_meta($post->ID, 'medium', true) ?: '',
+        'dimensions'           => get_post_meta($post->ID, 'dimensions', true) ?: '',
+        'keywords'             => array_values($keywords),
+        'category'             => get_post_meta($post->ID, 'category', true) ?: 'Painting',
+        'status'               => $status,
+        'location'             => $location,
+        'art_revisionist_url'  => get_post_meta($post->ID, 'art_revisionist_url', true) ?: '',
+        'provenance'           => get_post_meta($post->ID, 'provenance', true) ?: '',
+        'exhibition'           => get_post_meta($post->ID, 'exhibition', true) ?: '',
+        'qr_slug'              => get_post_meta($post->ID, 'qr_slug', true) ?: '',
+        'silhouette'           => get_post_meta($post->ID, 'silhouette', true) ?: '',
+        'date'                 => get_the_date('c', $post),
     ];
 }
 
@@ -434,10 +520,11 @@ function opus_format_artist_data($post) {
         'name'        => get_the_title($post),
         'slug'        => $post->post_name,
         'bio'         => get_the_content(null, false, $post),
-        'photo'       => get_the_post_thumbnail_url($post, 'opus-medium'),
-        'nationality' => get_post_meta($post->ID, 'nationality', true),
-        'birth_year'  => get_post_meta($post->ID, 'birth_year', true),
-        'website'     => get_post_meta($post->ID, 'website', true),
+        'photo'       => get_the_post_thumbnail_url($post, 'opus-medium') ?: '',
+        'nationality' => get_post_meta($post->ID, 'nationality', true) ?: '',
+        'speciality'  => get_post_meta($post->ID, 'speciality', true) ?: '',
+        'birth_year'  => get_post_meta($post->ID, 'birth_year', true) ?: '',
+        'website'     => get_post_meta($post->ID, 'website', true) ?: '',
         'date'        => get_the_date('c', $post),
     ];
 }
@@ -497,10 +584,12 @@ add_action('rest_api_init', 'opus_add_cors_headers');
 function opus_register_page_meta() {
     register_rest_field('page', 'meta_fields', [
         'get_callback' => function($post) {
+            $hero_bg = get_the_post_thumbnail_url($post['id'], 'opus-hero');
             return [
                 'hero_location'    => get_post_meta($post['id'], 'hero_location', true),
                 'hero_subtitle'    => get_post_meta($post['id'], 'hero_subtitle', true),
                 'hero_button_text' => get_post_meta($post['id'], 'hero_button_text', true),
+                'hero_background'  => $hero_bg ?: '',
             ];
         },
         'schema' => [
@@ -526,5 +615,115 @@ add_action('template_redirect', function () {
     }
 });
 
+/**
+ * Dequeue WordPress's bundled React on the frontend.
+ *
+ * Our Vite build bundles its own React 18. If WordPress (or a plugin) also
+ * enqueues wp-element / react, the two copies conflict and cause
+ * "Invalid hook call" errors (React error #300).
+ */
+function opus_dequeue_wp_react() {
+    if (!is_admin()) {
+        wp_dequeue_script('wp-element');
+        wp_dequeue_script('react');
+        wp_dequeue_script('react-dom');
+        wp_dequeue_script('react-jsx-runtime');
+    }
+}
+add_action('wp_enqueue_scripts', 'opus_dequeue_wp_react', 100);
+
 // Disable WordPress theme file editor for security
 define('DISALLOW_FILE_EDIT', true);
+
+/**
+ * Register ACF Field Groups for Content Admin UX
+ *
+ * These fields appear in the WordPress admin when editing CPT posts,
+ * giving gallery staff a proper form for entering artwork/artist data.
+ * Requires the ACF plugin to be active.
+ */
+function opus_register_acf_fields() {
+    if (!function_exists('acf_add_local_field_group')) return;
+
+    // --- Artwork Fields ---
+    acf_add_local_field_group([
+        'key'      => 'group_opus_artwork',
+        'title'    => 'Artwork Details',
+        'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'opus_artwork']]],
+        'position' => 'normal',
+        'style'    => 'default',
+        'fields'   => [
+            ['key' => 'field_artist_id', 'label' => 'Artist', 'name' => 'artist_id', 'type' => 'post_object',
+                'post_type' => ['opus_artist'], 'return_format' => 'id', 'required' => 1,
+                'instructions' => 'Select the artist who created this work.'],
+            ['key' => 'field_gallery_id', 'label' => 'Gallery', 'name' => 'gallery_id', 'type' => 'post_object',
+                'post_type' => ['opus_gallery'], 'return_format' => 'id',
+                'instructions' => 'Which gallery does this artwork belong to?'],
+            ['key' => 'field_year', 'label' => 'Year', 'name' => 'year', 'type' => 'text', 'placeholder' => '2024'],
+            ['key' => 'field_medium', 'label' => 'Medium', 'name' => 'medium', 'type' => 'text',
+                'placeholder' => 'Acrylic and oil on canvas'],
+            ['key' => 'field_dimensions', 'label' => 'Dimensions', 'name' => 'dimensions', 'type' => 'text',
+                'placeholder' => '150 × 120 cm'],
+            ['key' => 'field_category', 'label' => 'Category', 'name' => 'category', 'type' => 'select',
+                'choices' => [
+                    'Painting' => 'Painting', 'Abstract' => 'Abstract', 'Mixed Media' => 'Mixed Media',
+                    'Figurative' => 'Figurative', 'Print' => 'Print', 'Sculpture' => 'Sculpture',
+                    'Pop Art' => 'Pop Art', 'Ceramics' => 'Ceramics',
+                ],
+                'default_value' => 'Painting'],
+            ['key' => 'field_price', 'label' => 'Price (EUR)', 'name' => 'price', 'type' => 'number',
+                'instructions' => 'Price in euros (e.g. 4500). Leave empty for "Price on request".'],
+            ['key' => 'field_price_label', 'label' => 'Price Label', 'name' => 'price_label', 'type' => 'text',
+                'instructions' => 'Optional custom price display (e.g. "Price on request").'],
+            ['key' => 'field_status', 'label' => 'Status', 'name' => 'status', 'type' => 'select',
+                'choices' => ['available' => 'Available', 'sold' => 'Sold', 'on-loan' => 'On Loan'],
+                'default_value' => 'available'],
+            ['key' => 'field_location', 'label' => 'Location', 'name' => 'location', 'type' => 'select',
+                'choices' => ['gallery' => 'Gallery (showroom)', 'depot' => 'Depot (storage)'],
+                'default_value' => 'gallery'],
+            ['key' => 'field_short_desc', 'label' => 'Short Description', 'name' => 'short_description',
+                'type' => 'textarea', 'rows' => 3,
+                'instructions' => 'Brief overview (shown in listings). Falls back to main content if empty.'],
+            ['key' => 'field_extended_desc', 'label' => 'Extended Description', 'name' => 'extended_description',
+                'type' => 'wysiwyg', 'media_upload' => 0, 'tabs' => 'visual',
+                'instructions' => 'Full description shown on detail page.'],
+            ['key' => 'field_story', 'label' => 'Story', 'name' => 'story', 'type' => 'wysiwyg',
+                'media_upload' => 0, 'tabs' => 'visual',
+                'instructions' => 'The narrative behind this artwork.'],
+            ['key' => 'field_keywords', 'label' => 'Keywords', 'name' => 'keywords', 'type' => 'text',
+                'instructions' => 'Comma-separated keywords for search/filtering.',
+                'placeholder' => 'abstract, contemporary, blue, large'],
+            ['key' => 'field_additional_images', 'label' => 'Additional Images', 'name' => 'additional_images',
+                'type' => 'gallery', 'return_format' => 'id', 'preview_size' => 'thumbnail',
+                'instructions' => 'Extra photos of the artwork. The Featured Image is the main photo.'],
+            ['key' => 'field_art_revisionist_url', 'label' => 'Art Revisionist URL', 'name' => 'art_revisionist_url',
+                'type' => 'url'],
+            ['key' => 'field_provenance', 'label' => 'Provenance', 'name' => 'provenance', 'type' => 'textarea',
+                'rows' => 2],
+            ['key' => 'field_exhibition', 'label' => 'Exhibition History', 'name' => 'exhibition',
+                'type' => 'text'],
+            ['key' => 'field_qr_slug', 'label' => 'QR Code Slug', 'name' => 'qr_slug', 'type' => 'text',
+                'instructions' => 'Custom slug for QR code landing page.'],
+            ['key' => 'field_silhouette', 'label' => 'Silhouette / Technical Drawing', 'name' => 'silhouette',
+                'type' => 'image', 'return_format' => 'url', 'preview_size' => 'thumbnail'],
+        ],
+    ]);
+
+    // --- Artist Fields ---
+    acf_add_local_field_group([
+        'key'      => 'group_opus_artist',
+        'title'    => 'Artist Details',
+        'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'opus_artist']]],
+        'position' => 'normal',
+        'style'    => 'default',
+        'fields'   => [
+            ['key' => 'field_nationality', 'label' => 'Nationality', 'name' => 'nationality', 'type' => 'text',
+                'placeholder' => 'Dutch'],
+            ['key' => 'field_speciality', 'label' => 'Speciality', 'name' => 'speciality', 'type' => 'text',
+                'placeholder' => 'Mixed Media, Painting'],
+            ['key' => 'field_birth_year', 'label' => 'Birth Year', 'name' => 'birth_year', 'type' => 'number'],
+            ['key' => 'field_website', 'label' => 'Website', 'name' => 'website', 'type' => 'url'],
+        ],
+    ]);
+}
+add_action('acf/init', 'opus_register_acf_fields');
